@@ -3,6 +3,8 @@
 # CSC384 - Intro to AI
 ###########################################
 # Tyler Weston, 2019
+# TODO:
+#  clean up state generation process
 
 jug1size = 0
 jug2size = 0
@@ -74,12 +76,29 @@ def S(node):
     state = node[-1]
     jug1, jug2 = state
 
+    #TODO:
+    # make adding nodes to return list cleaner
+    # we have a list of possible next states below
+    # figure out a way to iterate through this and automate
+    # this procedure
+
+    # possible next states:
+    # (jug1, 0)
+    # (0, jug2)
+    # (jug1size, jug2)
+    # (jug1, jug2size)
+    # (jug1 - min(jug1, jug2size - jug2), jug2 + min(jug1, jug2size - jug2))
+    # (jug1 + min(jug2, jug1size - jug1), jug2 - min(jug2, jug1size - jug1))
+
+
+
     # dump jug1
     if (0, jug2) != state:
         if not (0, jug2) in node:
             new_node = node.copy()
             new_node.append((0, jug2))
             returnlist.append(new_node)
+
     # dump jug2
     if (jug1, 0) != state:
         if not (jug1, 0) in node:
@@ -106,6 +125,10 @@ def S(node):
     pouramount = min(jug1, jug2space)
     jug2new = jug2 + pouramount
     jug1new = jug1 - pouramount
+
+    # j1 = jug1 - (min(jug1, jug2size - jug2))
+    # j2 = jug2 + (min(jug1, jug2size - jug2))
+
     if (jug1new, jug2new) != state:
         if not (jug1new, jug2new) in node:
             new_node = node.copy()
@@ -117,6 +140,10 @@ def S(node):
     pouramount = min(jug2, jug1space)
     jug1new = jug1 + pouramount
     jug2new = jug2 - pouramount
+
+    # j1 = jug1 + min(jug2, jug1size - jug1)
+    # j2 = jug2 - min(jug2, jug1size - jug1)
+
     if (jug1new, jug2new) != state:
         if not (jug1new, jug2new) in node:
             new_node = node.copy()
@@ -124,6 +151,15 @@ def S(node):
             returnlist.append(new_node)
 
     return returnlist
+
+# Maybe use this eventually?
+# def checkState(new_state, old_state, node):
+#     if new_state != old_state:
+#         if not new_state in node:
+#             new_node = node.copy()
+#             new_node.append(new_state)
+#             return new_node
+#     return False
 
 if __name__ == "__main__":
     print("Water jug problem solver")
