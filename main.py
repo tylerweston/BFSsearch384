@@ -3,8 +3,6 @@
 # CSC384 - Intro to AI
 ###########################################
 # Tyler Weston, 2019
-# TODO:
-#  clean up state generation process
 
 jug1size = 0
 jug2size = 0
@@ -17,16 +15,12 @@ def do_main():
     global jug2size
     jug2size = int(input("Jug 2 size:"))
 
-    # get starting state
-    startstate1 = input("Starting state jug 1:")
-    startstate2 = input("Starting state jug 2:")
-
     #get goal state
     goalstate1 = input("Goal state jug 1:")
     goalstate2 = input("Goal state jug 2:")
 
     #pack tuples
-    startstate = (int(startstate1), int(startstate2))
+    startstate = (0, 0)
     goalstate = (int(goalstate1), int(goalstate2))
 
     # make our starting open list
@@ -62,6 +56,20 @@ def do_main():
 # generate all possible actions that will not result in no-ops or cycles
 # return a list of valid states
 def S(node):
+
+    # setup vars
+    returnlist = []
+    state = node[-1]
+    jug1, jug2 = state
+
+
+    def checkState(new_state, old_state):
+        if new_state != old_state:
+            if not new_state in node:
+                new_node = node.copy()
+                new_node.append(new_state)
+                returnlist.append(new_node)
+
     # possible actions
     # ----------------
     # dump out jug1
@@ -71,18 +79,8 @@ def S(node):
     # jug1 -> jug2
     # jug2 -> jug1
 
-    # setup vars
-    returnlist = []
-    state = node[-1]
-    jug1, jug2 = state
-
-    #TODO:
-    # make adding nodes to return list cleaner
-    # we have a list of possible next states below
-    # figure out a way to iterate through this and automate
-    # this procedure
-
     # possible next states:
+    # ---------------------
     # (jug1, 0)
     # (0, jug2)
     # (jug1size, jug2)
@@ -90,76 +88,13 @@ def S(node):
     # (jug1 - min(jug1, jug2size - jug2), jug2 + min(jug1, jug2size - jug2))
     # (jug1 + min(jug2, jug1size - jug1), jug2 - min(jug2, jug1size - jug1))
 
-
-
-    # dump jug1
-    if (0, jug2) != state:
-        if not (0, jug2) in node:
-            new_node = node.copy()
-            new_node.append((0, jug2))
-            returnlist.append(new_node)
-
-    # dump jug2
-    if (jug1, 0) != state:
-        if not (jug1, 0) in node:
-            new_node = node.copy()
-            new_node.append((jug1, 0))
-            returnlist.append(new_node)
-
-    # fill jug1
-    if (jug1size, jug2) != state:
-        if not (jug1size, jug2) in node:
-            new_node = node.copy()
-            new_node.append((jug1size, jug2))
-            returnlist.append(new_node)
-
-    #fill jug2
-    if (jug1, jug2size) != state:
-        if not (jug1, jug2size) in node:
-            new_node = node.copy()
-            new_node.append((jug1, jug2size))
-            returnlist.append(new_node)
-
-    #jug1 -> jug2
-    jug2space = jug2size - jug2
-    pouramount = min(jug1, jug2space)
-    jug2new = jug2 + pouramount
-    jug1new = jug1 - pouramount
-
-    # j1 = jug1 - (min(jug1, jug2size - jug2))
-    # j2 = jug2 + (min(jug1, jug2size - jug2))
-
-    if (jug1new, jug2new) != state:
-        if not (jug1new, jug2new) in node:
-            new_node = node.copy()
-            new_node.append((jug1new, jug2new))
-            returnlist.append(new_node)
-
-    #jug2 -> jug1
-    jug1space = jug1size - jug1
-    pouramount = min(jug2, jug1space)
-    jug1new = jug1 + pouramount
-    jug2new = jug2 - pouramount
-
-    # j1 = jug1 + min(jug2, jug1size - jug1)
-    # j2 = jug2 - min(jug2, jug1size - jug1)
-
-    if (jug1new, jug2new) != state:
-        if not (jug1new, jug2new) in node:
-            new_node = node.copy()
-            new_node.append((jug1new, jug2new))
-            returnlist.append(new_node)
+    slist = [(jug1, 0), (0, jug2), (jug1size, jug2), (jug1, jug2size),
+             (jug1 - min(jug1, jug2size - jug2), jug2 + min(jug1, jug2size - jug2)),
+             (jug1 + min(jug2, jug1size - jug1), jug2 - min(jug2, jug1size - jug1))]
+    for s in slist:
+        checkState(s, state)
 
     return returnlist
-
-# Maybe use this eventually?
-# def checkState(new_state, old_state, node):
-#     if new_state != old_state:
-#         if not new_state in node:
-#             new_node = node.copy()
-#             new_node.append(new_state)
-#             return new_node
-#     return False
 
 if __name__ == "__main__":
     print("Water jug problem solver")
